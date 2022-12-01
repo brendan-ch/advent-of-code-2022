@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 fn main() {
-    let input = include_str!("../input.txt");
+    let input = include_str!("../input.txt").to_owned() + "\n";
     let now = Instant::now();
 
     let mut most = 0;
