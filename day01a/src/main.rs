@@ -4,8 +4,6 @@ fn main() {
     let input = include_str!("../input.txt");
     let now = Instant::now();
 
-    println!("Hello, world!");
-
     let mut most = 0;
     let mut current = 0;
     for line in input.split('\n') {

@@ -4,8 +4,6 @@ fn main() {
     let input = include_str!("../input.txt").to_owned() + "\n";
     let now = Instant::now();
 
-    println!("Hello, world!");
-
     let mut most = 0;
     let mut second_most = 0;
     let mut third_most = 0;
