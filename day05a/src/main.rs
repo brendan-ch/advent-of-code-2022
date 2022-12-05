@@ -4,7 +4,7 @@ fn main() {
     let now = Instant::now();
     let input = include_str!("../input.txt");
 
-    let mut stacks: Vec<VecDeque<&str>> = vec![
+    let mut stacks: [VecDeque<&str>; 9] = [
         VecDeque::new(),
         VecDeque::new(),
         VecDeque::new(),
