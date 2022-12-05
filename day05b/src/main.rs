@@ -4,37 +4,24 @@ fn main() {
     let now = Instant::now();
     let input = include_str!("../input.txt");
 
-    let mut stacks: [VecDeque<&str>; 9] = [
-        VecDeque::new(),
-        VecDeque::new(),
-        VecDeque::new(),
-        VecDeque::new(),
-        VecDeque::new(),
-        VecDeque::new(),
-        VecDeque::new(),
-        VecDeque::new(),
-        VecDeque::new(),
-    ];
+    let mut stacks: Vec<VecDeque<&str>> = vec![VecDeque::new(); 9];
     let mut instructions = false;
 
     for line in input.split('\n') {
         if instructions {
             // do some light reading
-            let mut numbers_iterator = line.split(' ');
-            numbers_iterator.next();
+            let mut n: [usize; 3] = [0, 0, 0];
+            let iterator = line.split(' ').filter(|x| x.parse::<i32>().is_ok());
+            let mut c = 0;
+            iterator.for_each(|x| {
+                n[c] = x.parse::<usize>().unwrap();
+                c += 1;
+            });
 
-            let num_to_move = numbers_iterator.next().unwrap().parse::<i32>().unwrap();
-            numbers_iterator.next();
-            
-            let initial_stack = numbers_iterator.next().unwrap().parse::<usize>().unwrap();
-            numbers_iterator.next();
-        
-            let target_stack = numbers_iterator.next().unwrap().parse::<usize>().unwrap();
-
-            for x in (0..num_to_move).rev() {
+            for x in (0..n[0]).rev() {
                 // move some boxes
-                let to_move = stacks[initial_stack - 1].remove(x as usize).unwrap();
-                stacks[target_stack - 1].push_front(to_move);
+                let to_move = stacks[n[1] - 1].remove(x as usize).unwrap();
+                stacks[n[2] - 1].push_front(to_move);
             }
 
         } else {
