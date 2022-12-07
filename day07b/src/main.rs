@@ -103,7 +103,6 @@ fn main() {
     // Go through the tree
     let mut sizes: Vec<i32> = Vec::new();
     let space_taken = trace(files.get("/").unwrap(), &files, &mut sizes);
-    println!("{space_taken}");
 
     let total_on_disk = 70000000;
     let required_for_update = 30000000;
