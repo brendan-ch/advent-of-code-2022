@@ -1,7 +1,8 @@
 // love me some spaghett
 // https://images.unsplash.com/photo-1627286400579-027de47e9e73?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3687&q=80
 
-use std::{collections::HashMap, time::Instant};
+use std::{time::Instant};
+use hashbrown::HashMap;
 
 const FILE_DELIMITER: &str = ":";
 
@@ -38,7 +39,7 @@ fn main() {
     // The first line is always "cd /"
     let mut dir_stack = vec![];
 
-    for line in input.split('\n') {
+    for line in input.lines() {
         if line.starts_with("$ cd") {
             // change the current directory
             if &line[5..] == ".." {
