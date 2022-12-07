@@ -40,6 +40,11 @@ fn main() {
     let mut dir_stack = vec![];
 
     for line in input.lines() {
+        let wd = files.get_mut(&dir_stack.join(FILE_DELIMITER));
+        // find the index of the space
+        let space_index = line.find(" ").unwrap();
+        let name = &line[(space_index + 1)..];
+
         if line.starts_with("$ cd") {
             // change the current directory
             if &line[5..] == ".." {
@@ -49,48 +54,28 @@ fn main() {
                 // Add the an item
                 dir_stack.push(&line[5..]);
             }
-        } else if line.starts_with("dir") {
-            // Read the next line with respect to the current directory
-            let mut_file = files.get_mut(&dir_stack.join(FILE_DELIMITER));
-            if mut_file.is_none() {
-                // create a new file
-                files.insert(dir_stack.join(FILE_DELIMITER), File {
-                    is_directory: true,
-                    pointers: vec![dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + &line[4..].to_string()],
-                    size: None,
-                });
-            } else {
-                mut_file.unwrap().pointers.push(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + &line[4..].to_string());
-            }
-        } else if line.starts_with(char::is_numeric) {
-            // line starts with a number
-            // find the index of the space
-            let space_index = line.find(" ").unwrap();
-            // get the number
-            let size = line[..space_index].parse::<i32>().unwrap();
-            let name = &line[(space_index + 1)..];
-
-            // mutable file from the current working directory
-            let mut_file = files.get_mut(&dir_stack.join(FILE_DELIMITER));
-
-            // add as a file
-            if mut_file.is_none() {
-                // create a new file
+        } else if !line.starts_with("$ ls") {
+            // add wd as a file
+            if wd.is_none() {
+                // create directory
                 files.insert(dir_stack.join(FILE_DELIMITER), File {
                     is_directory: true,
                     pointers: vec![dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name],
                     size: None,
                 });
             } else {
-                mut_file.unwrap().pointers.push(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name);
+                wd.unwrap().pointers.push(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name);
             }
 
-            // either way, create a new file
-            files.insert(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name, File {
-                is_directory: false,
-                pointers: vec![],
-                size: Some(size),
-            });
+            if line.starts_with(char::is_numeric) {
+                // create file
+                let size = line[..space_index].parse::<i32>().unwrap();
+                files.insert(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name, File {
+                    is_directory: false,
+                    pointers: vec![],
+                    size: Some(size),
+                });
+            }
         }
     }
 
