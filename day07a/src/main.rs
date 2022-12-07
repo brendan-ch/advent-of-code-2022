@@ -41,23 +41,14 @@ fn main() {
     let mut dir_stack = vec![];
 
     for line in input.split('\n') {
-        if line.starts_with("$") {
-            // read the command
-            match &line[2..4] {
-                "cd" => {
-                    // change the current directory
-                    if &line[5..] == ".." {
-                        // Pop the last item
-                        dir_stack.pop();
-                    } else {
-                        // Add the an item
-                        dir_stack.push(&line[5..]);
-                    }
-                }
-                "ls" => {
-                    // Ignore?
-                }
-                _ => {}
+        if line.starts_with("$ cd") {
+            // change the current directory
+            if &line[5..] == ".." {
+                // Pop the last item
+                dir_stack.pop();
+            } else {
+                // Add the an item
+                dir_stack.push(&line[5..]);
             }
         } else if line.starts_with("dir") {
             // Read the next line with respect to the current directory
@@ -72,7 +63,7 @@ fn main() {
             } else {
                 mut_file.unwrap().pointers.push(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + &line[4..].to_string());
             }
-        } else {
+        } else if line.starts_with(char::is_numeric) {
             // line starts with a number
             // find the index of the space
             let space_index = line.find(" ").unwrap();
