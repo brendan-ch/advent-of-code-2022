@@ -106,7 +106,6 @@ fn main() {
     let mut sizes: Vec<i32> = Vec::new();
     trace(files.get("/").unwrap(), &files, &mut sizes);
 
-    sizes.sort_by(|a, b| b.cmp(a));
     let mut sum = 0;
     for size in sizes.iter() {
         sum += size;
