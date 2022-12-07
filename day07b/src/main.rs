@@ -3,6 +3,8 @@
 
 use std::{collections::HashMap, time::Instant};
 
+const FILE_DELIMITER: &str = ":";
+
 #[derive(Debug)]
 struct File {
     is_directory: bool,
@@ -57,16 +59,16 @@ fn main() {
             }
         } else if line.starts_with("dir") {
             // Read the next line with respect to the current directory
-            let mut_file = files.get_mut(&dir_stack.join(":"));
+            let mut_file = files.get_mut(&dir_stack.join(FILE_DELIMITER));
             if mut_file.is_none() {
                 // create a new file
-                files.insert(dir_stack.join(":"), File {
+                files.insert(dir_stack.join(FILE_DELIMITER), File {
                     is_directory: true,
-                    pointers: vec![dir_stack.join(":") + ":" + &line[4..].to_string()],
+                    pointers: vec![dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + &line[4..].to_string()],
                     size: None,
                 });
             } else {
-                mut_file.unwrap().pointers.push(dir_stack.join(":") + ":" + &line[4..].to_string());
+                mut_file.unwrap().pointers.push(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + &line[4..].to_string());
             }
         } else {
             // line starts with a number
@@ -77,22 +79,22 @@ fn main() {
             let name = &line[(space_index + 1)..];
 
             // mutable file from the current working directory
-            let mut_file = files.get_mut(&dir_stack.join(":"));
+            let mut_file = files.get_mut(&dir_stack.join(FILE_DELIMITER));
 
             // add as a file
             if mut_file.is_none() {
                 // create a new file
-                files.insert(dir_stack.join(":"), File {
+                files.insert(dir_stack.join(FILE_DELIMITER), File {
                     is_directory: true,
-                    pointers: vec![dir_stack.join(":") + ":" + name],
+                    pointers: vec![dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name],
                     size: None,
                 });
             } else {
-                mut_file.unwrap().pointers.push(dir_stack.join(":") + ":" + name);
+                mut_file.unwrap().pointers.push(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name);
             }
 
             // either way, create a new file
-            files.insert(dir_stack.join(":") + ":" + name, File {
+            files.insert(dir_stack.join(FILE_DELIMITER) + FILE_DELIMITER + name, File {
                 is_directory: false,
                 pointers: vec![],
                 size: Some(size),
