@@ -21,58 +21,84 @@ fn main() {
     let now = Instant::now();
     let input = include_str!("../input.txt");
 
-    let mut monkeys = input.split("\n\n").map(|monke_str| {
-        let mut split = monke_str.split(&[':', '\n']);
+    let mut monkeys = input
+        .split("\n\n")
+        .map(|monke_str| {
+            let mut split = monke_str.split(&[':', '\n']);
 
-        Monke {
-            items: split.nth(3).unwrap().split(", ").map(|x| {
-                x.trim().parse::<i32>().unwrap()
-            }).collect(),
-            operation: {
-                let mut iter = split.nth(1).unwrap().split(" ");
+            Monke {
+                items: split
+                    .nth(3)
+                    .unwrap()
+                    .split(", ")
+                    .map(|x| x.trim().parse::<i32>().unwrap())
+                    .collect(),
+                operation: {
+                    let mut iter = split.nth(1).unwrap().split(" ");
 
-                Operation {
-                    left: iter.nth(3).unwrap().to_string(),
-                    operator: iter.next().unwrap().chars().next().unwrap(),
-                    right: iter.next().unwrap().to_string(),
-                }
-            },
-            test: {
-                let val = split.nth(1).unwrap().split(" ").nth(3).unwrap();
-                val.parse::<i32>().unwrap()
-            },
-            if_true: split.nth(1).unwrap().split(" ").nth(4).unwrap().parse::<usize>().unwrap(),
-            if_false: split.nth(1).unwrap().split(" ").nth(4).unwrap().parse::<usize>().unwrap(),
-            times_inspected: 0,
-        }
-    }).collect::<Vec<Monke>>();
-    
+                    Operation {
+                        left: iter.nth(3).unwrap().to_string(),
+                        operator: iter.next().unwrap().chars().next().unwrap(),
+                        right: iter.next().unwrap().to_string(),
+                    }
+                },
+                test: {
+                    let val = split.nth(1).unwrap().split(" ").nth(3).unwrap();
+                    val.parse::<i32>().unwrap()
+                },
+                if_true: split
+                    .nth(1)
+                    .unwrap()
+                    .split(" ")
+                    .nth(4)
+                    .unwrap()
+                    .parse::<usize>()
+                    .unwrap(),
+                if_false: split
+                    .nth(1)
+                    .unwrap()
+                    .split(" ")
+                    .nth(4)
+                    .unwrap()
+                    .parse::<usize>()
+                    .unwrap(),
+                times_inspected: 0,
+            }
+        })
+        .collect::<Vec<Monke>>();
+
     for _ in 0..20 {
         for i in 0..monkeys.len() {
+            // monkey see, monkey throw
             while monkeys[i].items.len() > 0 {
                 let mut item = monkeys[i].items[0];
                 monkeys[i].times_inspected += 1;
-                
-                match monkeys[i].operation.operator {
-                    '+' => monkeys[i].items[0] = (
-                        if monkeys[i].operation.left == "old" { item } else { monkeys[i].operation.left.parse::<i32>().unwrap() }
-                    ) + (
-                        if monkeys[i].operation.right == "old" { item } else { monkeys[i].operation.right.parse::<i32>().unwrap() }
-                    ),
-                    '*' => monkeys[i].items[0] = (
-                        if monkeys[i].operation.left == "old" { item } else { monkeys[i].operation.left.parse::<i32>().unwrap() }
-                    ) * (
-                        if monkeys[i].operation.right == "old" { item } else { monkeys[i].operation.right.parse::<i32>().unwrap() }
-                    ),
-                    _ => {},
+
+                let mut left = Ok(item);
+                let mut right = Ok(item);
+                if monkeys[i].operation.left != "old" {
+                    left = monkeys[i].operation.left.parse::<i32>();
                 }
-    
+                if monkeys[i].operation.right != "old" {
+                    right = monkeys[i].operation.right.parse::<i32>();
+                }
+
+                if monkeys[i].operation.operator == '+' {
+                    monkeys[i].items[0] = left.unwrap() + right.unwrap();
+                } else {
+                    monkeys[i].items[0] = left.unwrap() * right.unwrap();
+                }
+
                 monkeys[i].items[0] /= 3;
-                
+
                 // Test
-                let new_index = if monkeys[i].items[0] % monkeys[i].test == 0 { monkeys[i].if_true } else { monkeys[i].if_false };
+                let new_index = if monkeys[i].items[0] % monkeys[i].test == 0 {
+                    monkeys[i].if_true
+                } else {
+                    monkeys[i].if_false
+                };
                 // println!("Worry level: {}  New index: {}  Test: {}", monkeys[i].items[0], new_index, monkeys[i].test);
-    
+
                 // Move to new index
                 item = monkeys[i].items[0];
                 monkeys[new_index].items.push_back(item);
